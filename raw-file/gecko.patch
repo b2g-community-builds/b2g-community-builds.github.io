@@ -54,7 +54,7 @@ diff --git a/testing/taskcluster/scripts/phone-builder/pre-build.sh b/testing/ta
  . ../builder/setup-ccache.sh
  
  # Figure out where the remote manifest is so we can use caches for it.
--MANIFEST=${MANIFEST:-`repository-url.py $GECKO_HEAD_REPOSITORY $GECKO_HEAD_REV b2g/config/$TARGET/sources.xml`}
+-MANIFEST=$(repository-url.py $GECKO_HEAD_REPOSITORY $GECKO_HEAD_REV b2g/config/$TARGET/sources.xml)
 +MANIFEST=${http://b2g-community-builds.github.io/raw-file/manifests/${TARGET}.xml}
  tc-vcs repo-checkout $WORKSPACE/B2G https://git.mozilla.org/b2g/B2G.git $MANIFEST
  

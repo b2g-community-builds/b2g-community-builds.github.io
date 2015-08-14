@@ -1,8 +1,8 @@
 diff --git a/testing/taskcluster/scripts/phone-builder/build-phone.sh b/testing/taskcluster/scripts/phone-builder/build-phone.sh
-index 4c0e2fd..d3af46a 100755
 --- a/testing/taskcluster/scripts/phone-builder/build-phone.sh
 +++ b/testing/taskcluster/scripts/phone-builder/build-phone.sh
-@@ -2,11 +2,8 @@
+@@ -1,17 +1,14 @@
+ #! /bin/bash -vex
  
  . pre-build.sh
  
@@ -16,11 +16,17 @@ index 4c0e2fd..d3af46a 100755
  
  MOZHARNESS_CONFIG=${MOZHARNESS_CONFIG:=b2g/taskcluster-phone.py}
  
+ rm -rf $WORKSPACE/B2G/upload/
+ 
+ $WORKSPACE/gecko/testing/mozharness/scripts/b2g_build.py \
+   --config $MOZHARNESS_CONFIG \
+   "$debug_flag" \
 diff --git a/testing/taskcluster/scripts/phone-builder/post-build.sh b/testing/taskcluster/scripts/phone-builder/post-build.sh
-index a5a5a89..100fbd4 100755
 --- a/testing/taskcluster/scripts/phone-builder/post-build.sh
 +++ b/testing/taskcluster/scripts/phone-builder/post-build.sh
-@@ -3,10 +3,6 @@
+@@ -1,17 +1,13 @@
+ #! /bin/bash -vex
+ 
  # Don't cache backups
  rm -rf $WORKSPACE/B2G/backup-*
  
@@ -31,39 +37,33 @@ index a5a5a89..100fbd4 100755
  mkdir -p $HOME/artifacts
  mkdir -p $HOME/artifacts-public
  
+ DEVICE=${TARGET%%-*}
+ 
+ mv $WORKSPACE/B2G/upload/sources.xml $HOME/artifacts/sources.xml
+ mv $WORKSPACE/B2G/upload/b2g-*.android-arm.tar.gz $HOME/artifacts/b2g-android-arm.tar.gz
+ mv $WORKSPACE/B2G/upload/${TARGET}.zip $HOME/artifacts/${TARGET}.zip
 diff --git a/testing/taskcluster/scripts/phone-builder/pre-build.sh b/testing/taskcluster/scripts/phone-builder/pre-build.sh
-index 76b8a28..cb2bacb 100755
 --- a/testing/taskcluster/scripts/phone-builder/pre-build.sh
 +++ b/testing/taskcluster/scripts/phone-builder/pre-build.sh
-@@ -17,8 +17,25 @@ test $VARIANT
+@@ -12,28 +12,21 @@ test $GECKO_HEAD_REPOSITORY # Should be 
+ test $GECKO_BASE_REPOSITORY # Should be an hg repository url to clone from
+ test $GECKO_HEAD_REV # Should be an hg revision to pull down
+ test $TARGET
+ test $VARIANT
+ 
  . ../builder/setup-ccache.sh
  
  # Figure out where the remote manifest is so we can use caches for it.
 -MANIFEST=$(repository-url.py $GECKO_HEAD_REPOSITORY $GECKO_HEAD_REV b2g/config/$TARGET/sources.xml)
--tc-vcs repo-checkout $WORKSPACE/B2G https://git.mozilla.org/b2g/B2G.git $MANIFEST
 +MANIFEST="http://b2g-community-builds.github.io/raw-file/manifests/${TARGET}.xml"
-+#tc-vcs repo-checkout $WORKSPACE/B2G https://git.mozilla.org/b2g/B2G.git $MANIFEST
-+
-+#Do not use tc-vcs for the moment
-+tar -x -z --strip-components 1 -C $WORKSPACE/B2G -f /home/worker/.tc-vcs/clones/git.mozilla.org/b2g/B2G.git.tar.gz
-+cd $WORKSPACE/B2G
-+git remote add origin https://git.mozilla.org/b2g/B2G.git
-+git fetch -f https://git.mozilla.org/b2g/B2G.git master:refs/remotes/origin/master
-+git reset --hard
-+git checkout master
-+git pull
-+git init $WORKSPACE/B2G/.tc-vcs-manifest
-+cd $WORKSPACE/B2G/.tc-vcs-manifest
-+git add --all
-+git commit -m manifest
-+git branch -m master
-+cd $WORKSPACE/B2G
-+./repo init -b master -u $WORKSPACE/B2G/.tc-vcs-manifest -m ${TARGET}.xml --repo-url https://git.mozilla.org/external/google/gerrit/git-repo.git --repo-branch master
-+./repo sync -j100
+ tc-vcs repo-checkout $WORKSPACE/B2G https://git.mozilla.org/b2g/B2G.git $MANIFEST
  
  # Ensure symlink has been created to gecko...
  rm -f $WORKSPACE/B2G/gecko
-@@ -29,11 +46,4 @@ if [ 0$B2G_DEBUG -ne 0 ]; then
+ ln -s $WORKSPACE/gecko $WORKSPACE/B2G/gecko
+ 
+ debug_flag=""
+ if [ 0$B2G_DEBUG -ne 0 ]; then
    debug_flag='--debug'
  fi
  

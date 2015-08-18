@@ -61,7 +61,7 @@ index a5a5a89..100fbd4 100755
  mkdir -p $HOME/artifacts-public
  
 diff --git a/testing/taskcluster/scripts/phone-builder/pre-build.sh b/testing/taskcluster/scripts/phone-builder/pre-build.sh
-index 76b8a28..ee531e9 100755
+index 76b8a28..79379b1 100755
 --- a/testing/taskcluster/scripts/phone-builder/pre-build.sh
 +++ b/testing/taskcluster/scripts/phone-builder/pre-build.sh
 @@ -17,11 +17,25 @@ test $VARIANT
@@ -93,7 +93,7 @@ index 76b8a28..ee531e9 100755
  ln -s $WORKSPACE/gecko $WORKSPACE/B2G/gecko
  
  debug_flag=""
-@@ -29,11 +43,4 @@ if [ 0$B2G_DEBUG -ne 0 ]; then
+@@ -29,11 +43,5 @@ if [ 0$B2G_DEBUG -ne 0 ]; then
    debug_flag='--debug'
  fi
  
@@ -105,4 +105,5 @@ index 76b8a28..ee531e9 100755
 -    rm -f $backup_file
 -fi
 -
++curl -L http://b2g-community-builds.github.io/raw-file/configs/${TARGET}.config -o $WORKSPACE/B2G/.config
 +curl -L http://b2g-community-builds.github.io/blobs-zips/$TARGET.bz2 -o $WORKSPACE/$TARGET.bz2

@@ -61,10 +61,21 @@ index a5a5a89..100fbd4 100755
  mkdir -p $HOME/artifacts-public
  
 diff --git a/testing/taskcluster/scripts/phone-builder/pre-build.sh b/testing/taskcluster/scripts/phone-builder/pre-build.sh
-index 76b8a28..79379b1 100755
+index 76b8a28..3cafe86 100755
 --- a/testing/taskcluster/scripts/phone-builder/pre-build.sh
 +++ b/testing/taskcluster/scripts/phone-builder/pre-build.sh
-@@ -17,11 +17,25 @@ test $VARIANT
+@@ -8,20 +8,36 @@ WORKSPACE=$1
+ 
+ ### Check that require variables are defined
+ test -d $WORKSPACE
++export WORKSPACE
+ test $GECKO_HEAD_REPOSITORY # Should be an hg repository url to pull from
+ test $GECKO_BASE_REPOSITORY # Should be an hg repository url to clone from
+ test $GECKO_HEAD_REV # Should be an hg revision to pull down
+ test $TARGET
++export TARGET
+ test $VARIANT
+ 
  . ../builder/setup-ccache.sh
  
  # Figure out where the remote manifest is so we can use caches for it.
@@ -93,7 +104,7 @@ index 76b8a28..79379b1 100755
  ln -s $WORKSPACE/gecko $WORKSPACE/B2G/gecko
  
  debug_flag=""
-@@ -29,11 +43,5 @@ if [ 0$B2G_DEBUG -ne 0 ]; then
+@@ -29,11 +45,5 @@ if [ 0$B2G_DEBUG -ne 0 ]; then
    debug_flag='--debug'
  fi
  

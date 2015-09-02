@@ -1,8 +1,8 @@
 diff --git a/testing/taskcluster/scripts/phone-builder/build-phone.sh b/testing/taskcluster/scripts/phone-builder/build-phone.sh
-index 4c0e2fd..c88bc4e 100755
+index 4c0e2fd..7d8abfb 100755
 --- a/testing/taskcluster/scripts/phone-builder/build-phone.sh
 +++ b/testing/taskcluster/scripts/phone-builder/build-phone.sh
-@@ -2,27 +2,25 @@
+@@ -2,27 +2,39 @@
  
  . pre-build.sh
  
@@ -43,13 +43,27 @@ index 4c0e2fd..c88bc4e 100755
 +#  --checkout-revision=$GECKO_HEAD_REV \
 +#  --repo=$WORKSPACE/gecko
 +./build.sh -j8
++
++mkdir -p $WORKSPACE/B2G/upload/
++
++cp $WORKSPACE/B2G/b2g-*.android-arm.tar.gz $WORKSPACE/B2G/upload/
++
++if [ $TARGET == "i9300" ]
++then
++  PWD=$PWD
++  cd $WORKSPACE/B2G/out/target/product/i9300/
++  tar -H ustar -c boot.img system.img userdata.img > odin.tar
++  md5sum -t odin.tar >> odin.tar
++  mv odin.tar $WORKSPACE/B2G/upload/odin.PDA.tar.md5
++  cd $PWD
++fi
  
  . post-build.sh
 diff --git a/testing/taskcluster/scripts/phone-builder/post-build.sh b/testing/taskcluster/scripts/phone-builder/post-build.sh
-index a5a5a89..100fbd4 100755
+index a5a5a89..77bdf13 100755
 --- a/testing/taskcluster/scripts/phone-builder/post-build.sh
 +++ b/testing/taskcluster/scripts/phone-builder/post-build.sh
-@@ -3,10 +3,6 @@
+@@ -3,19 +3,17 @@
  # Don't cache backups
  rm -rf $WORKSPACE/B2G/backup-*
  
@@ -60,6 +74,20 @@ index a5a5a89..100fbd4 100755
  mkdir -p $HOME/artifacts
  mkdir -p $HOME/artifacts-public
  
+ DEVICE=${TARGET%%-*}
+ 
+-mv $WORKSPACE/B2G/upload/sources.xml $HOME/artifacts/sources.xml
++#mv $WORKSPACE/B2G/upload/sources.xml $HOME/artifacts/sources.xml
+ mv $WORKSPACE/B2G/upload/b2g-*.android-arm.tar.gz $HOME/artifacts/b2g-android-arm.tar.gz
+-mv $WORKSPACE/B2G/upload/${TARGET}.zip $HOME/artifacts/${TARGET}.zip
+-mv $WORKSPACE/B2G/upload/gaia.zip $HOME/artifacts/gaia.zip
++#mv $WORKSPACE/B2G/upload/${TARGET}.zip $HOME/artifacts/${TARGET}.zip
++#mv $WORKSPACE/B2G/upload/gaia.zip $HOME/artifacts/gaia.zip
++
++if [ $TARGET == "i9300" ]; then mv $WORKSPACE/B2G/upload/odin.PDA.tar.md5 $HOME/artifacts/odin.PDA.tar.md5 ; fi
+ 
+ if [ -f $WORKSPACE/B2G/upload/b2g-*.crashreporter-symbols.zip ]; then
+   mv $WORKSPACE/B2G/upload/b2g-*.crashreporter-symbols.zip $HOME/artifacts/b2g-crashreporter-symbols.zip
 diff --git a/testing/taskcluster/scripts/phone-builder/pre-build.sh b/testing/taskcluster/scripts/phone-builder/pre-build.sh
 index 76b8a28..3cafe86 100755
 --- a/testing/taskcluster/scripts/phone-builder/pre-build.sh

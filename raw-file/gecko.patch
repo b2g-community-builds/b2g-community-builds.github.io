@@ -1,5 +1,5 @@
 diff --git a/testing/taskcluster/scripts/phone-builder/build-phone.sh b/testing/taskcluster/scripts/phone-builder/build-phone.sh
-index 4c0e2fd..e75b317 100755
+index 4c0e2fd..084e2a9 100755
 --- a/testing/taskcluster/scripts/phone-builder/build-phone.sh
 +++ b/testing/taskcluster/scripts/phone-builder/build-phone.sh
 @@ -2,27 +2,36 @@
@@ -49,15 +49,15 @@ index 4c0e2fd..e75b317 100755
 +if [ $TARGET == "i9300" ]
 +then
 +  cd $WORKSPACE/B2G/out/target/product/i9300/
-+  tar -H ustar -c boot.img system.img userdata.img > odin.tar
-+  md5sum -t odin.tar >> odin.tar
-+  mv odin.tar $WORKSPACE/B2G/upload/odin.PDA.tar.md5
++  tar -H ustar -c boot.img system.img userdata.img > B2G-I9300.PDA.tar
++  md5sum -t B2G-I9300.PDA.tar >> B2G-I9300.PDA.tar
++  mv B2G-I9300.PDA.tar $WORKSPACE/B2G/upload/B2G-I9300.PDA.tar.md5
 +  cd $WORKSPACE/B2G
 +fi
  
  . post-build.sh
 diff --git a/testing/taskcluster/scripts/phone-builder/post-build.sh b/testing/taskcluster/scripts/phone-builder/post-build.sh
-index a5a5a89..37d3bc9 100755
+index a5a5a89..cb472e2 100755
 --- a/testing/taskcluster/scripts/phone-builder/post-build.sh
 +++ b/testing/taskcluster/scripts/phone-builder/post-build.sh
 @@ -3,19 +3,17 @@
@@ -82,7 +82,7 @@ index a5a5a89..37d3bc9 100755
 +#mv $WORKSPACE/B2G/upload/${TARGET}.zip $HOME/artifacts/${TARGET}.zip
 +#mv $WORKSPACE/B2G/upload/gaia.zip $HOME/artifacts/gaia.zip
 +
-+if [ $TARGET == "i9300" ]; then mv $WORKSPACE/B2G/upload/odin.PDA.tar.md5 $HOME/artifacts/odin.PDA.tar.md5 ; fi
++if [ $TARGET == "i9300" ]; then mv $WORKSPACE/B2G/upload/B2G-I9300.PDA.tar.md5 $HOME/artifacts/B2G-I9300.PDA.tar.md5 ; fi
  
  if [ -f $WORKSPACE/B2G/upload/b2g-*.crashreporter-symbols.zip ]; then
    mv $WORKSPACE/B2G/upload/b2g-*.crashreporter-symbols.zip $HOME/artifacts/b2g-crashreporter-symbols.zip
